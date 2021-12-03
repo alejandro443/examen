@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,17 +50,25 @@ public class PacienteSerV {
 		}
 	}
 	//---------------------------------------------------------------------------------------------
-	@GetMapping("/alumno/{id}")
-	public ResponseEntity<Paciente> getUser(@PathVariable("id") long id){
-		Paciente alumno = pacienteservice.read(id);
-			if(alumno.getIdpaciente()>0) {
-				return new ResponseEntity<>(alumno, HttpStatus.OK);
+	@PutMapping("/update/{id}")
+	public ResponseEntity<Paciente> update(@RequestBody Paciente alum, @PathVariable("id") long id){
+		try {
+			Paciente ul = pacienteservice.read(id);
+			if(ul.getIdpaciente()>0) {
+				ul.setDni(alum.getDni());
+				ul.setNombres(alum.getNombres());
+				ul.setApellidos(alum.getApellidos());
+				ul.setTelefono(alum.getTelefono());
+				
+				return new ResponseEntity<>(pacienteservice.create(ul),HttpStatus.OK);
 			}else {
-			
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			} 
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}			
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
-	
 	//---------------------------------------------------------------------------------
 	@DeleteMapping("delete/{id}")
 	public ResponseEntity<HttpStatus> delete(@PathVariable("id") long id){
